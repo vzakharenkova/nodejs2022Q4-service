@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { validate as validateUUID } from 'uuid';
 
@@ -10,5 +10,9 @@ export class UtilsService {
     if (!isValidId) {
       throw new BadRequestException('User id is invalid (not uuid)');
     }
+  }
+
+  throwNotFoundException(entityName: string, id: string) {
+    throw new NotFoundException(`${entityName} with id ${id} is not found`);
   }
 }
