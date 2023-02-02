@@ -31,11 +31,8 @@ export class UsersService {
   }
 
   async findOne(id: string): Promise<User> {
-    const isValidId = validateUUID(id);
+    this.validateId(id);
 
-    if (!isValidId) {
-      throw new BadRequestException('User id is invalid (not uuid)');
-    }
     const user = this.users.find((user) => user.id === id);
 
     if (!user) {
@@ -46,16 +43,7 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const isValidId = validateUUID(id);
-
-    if (!isValidId) {
-      throw new BadRequestException('User id is invalid (not uuid)');
-    }
-    const user = this.users.find((user) => user.id === id);
-
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} is not found`);
-    }
+    const user = await this.findOne(id);
 
     if (updateUserDto.oldPassword !== user.password) {
       throw new ForbiddenException('Old password is wrong');
@@ -69,19 +57,18 @@ export class UsersService {
   }
 
   async remove(id: string) {
+    const user = await this.findOne(id);
+
+    const index = this.users.indexOf(user);
+
+    this.users.splice(index, 1);
+  }
+
+  private validateId(id: string) {
     const isValidId = validateUUID(id);
 
     if (!isValidId) {
       throw new BadRequestException('User id is invalid (not uuid)');
     }
-    const user = this.users.find((user) => user.id === id);
-
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} is not found`);
-    }
-
-    const index = this.users.indexOf(user);
-
-    this.users.splice(index, 1);
   }
 }
