@@ -12,7 +12,6 @@ export class Album {
   @IsNumber()
   year: number;
 
-  @IsNotEmpty()
   @Validate(IsNullOrString)
   artistId: string | null; // refers to Artist
 }

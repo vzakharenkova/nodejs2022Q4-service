@@ -8,11 +8,9 @@ export class Track {
   @IsString()
   name: string;
 
-  @IsNotEmpty()
   @Validate(IsNullOrString)
   artistId: string | null; // refers to Artist
 
-  @IsNotEmpty()
   @Validate(IsNullOrString)
   albumId: string | null; // refers to Album
 

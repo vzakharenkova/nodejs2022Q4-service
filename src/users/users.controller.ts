@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Param, Delete, UseFilters, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  UseFilters,
+  Put,
+  HttpCode,
+} from '@nestjs/common';
 
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -32,6 +42,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
   remove(@Param('id') id: string): Promise<void> {
     return this.usersService.remove(id);
   }

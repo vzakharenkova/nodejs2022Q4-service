@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UseFilters } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Put,
+  Param,
+  Delete,
+  UseFilters,
+  HttpCode,
+} from '@nestjs/common';
 import { HttpExceptionFilter } from 'src/utils/http-exception.filter';
 import { ArtistsService } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
@@ -31,6 +41,7 @@ export class ArtistsController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
   remove(@Param('id') id: string) {
     return this.artistsService.remove(id);
   }
