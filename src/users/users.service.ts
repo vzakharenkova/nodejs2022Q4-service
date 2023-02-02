@@ -1,14 +1,15 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ForbiddenException } from '@nestjs/common/exceptions';
+import { UtilsService } from 'src/utils/utils.service';
 
-import { v4 as uuidv4, validate as validateUUID } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 
 @Injectable()
-export class UsersService {
+export class UsersService extends UtilsService {
   private readonly users: User[] = [];
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -62,13 +63,5 @@ export class UsersService {
     const index = this.users.indexOf(user);
 
     this.users.splice(index, 1);
-  }
-
-  private validateId(id: string) {
-    const isValidId = validateUUID(id);
-
-    if (!isValidId) {
-      throw new BadRequestException('User id is invalid (not uuid)');
-    }
   }
 }
