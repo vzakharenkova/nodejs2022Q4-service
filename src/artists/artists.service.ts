@@ -12,14 +12,14 @@ export class ArtistsService extends UtilsService {
   private readonly atrists: Artist[] = [];
 
   async create(createArtistDto: CreateArtistDto): Promise<Artist> {
-    const user: Artist = {
+    const artist: Artist = {
       id: uuidv4(),
       ...createArtistDto,
     };
 
-    this.atrists.push(user);
+    this.atrists.push(artist);
 
-    return user;
+    return artist;
   }
 
   async findAll(): Promise<Artist[]> {
@@ -41,8 +41,9 @@ export class ArtistsService extends UtilsService {
   async update(id: string, updateArtistDto: UpdateArtistDto) {
     const artist = await this.findOne(id);
 
-    updateArtistDto.grammy ? (artist.grammy = updateArtistDto.grammy) : '';
-    updateArtistDto.name ? (artist.name = updateArtistDto.name) : '';
+    const keys = Object.keys(updateArtistDto);
+
+    keys.forEach((key) => (artist[key] = updateArtistDto[key]));
 
     return artist;
   }
