@@ -49,6 +49,12 @@ export class TracksService extends UtilsService {
     return track;
   }
 
+  async findMany(id: string, searchField: string): Promise<Track[]> {
+    this.validateId(id);
+
+    return this.tracks.filter((track) => track[searchField] === id);
+  }
+
   async update(id: string, updateTrackDto: UpdateTrackDto): Promise<Track> {
     const track = await this.findOne(id);
 
@@ -61,6 +67,10 @@ export class TracksService extends UtilsService {
 
   async remove(id: string): Promise<void> {
     const track = await this.findOne(id);
+
+    if (await this.favoritesService.findOne(id, 'tracks', 'id')) {
+      this.favoritesService.removeTrack(id);
+    }
 
     const index = this.tracks.indexOf(track);
 

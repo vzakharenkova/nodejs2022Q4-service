@@ -8,6 +8,8 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
 import { db } from 'src/database/db';
 import { FavoritesService } from 'src/favorites/favorites.service';
+import { AlbumsService } from 'src/albums/albums.service';
+import { TracksService } from 'src/tracks/tracks.service';
 
 @Injectable()
 export class ArtistsService extends UtilsService {
@@ -16,6 +18,12 @@ export class ArtistsService extends UtilsService {
   constructor(
     @Inject(forwardRef(() => FavoritesService))
     private favoritesService: FavoritesService,
+
+    @Inject(forwardRef(() => TracksService))
+    private tracksService: TracksService,
+
+    @Inject(forwardRef(() => AlbumsService))
+    private albumsService: AlbumsService,
   ) {
     super();
   }
@@ -61,6 +69,16 @@ export class ArtistsService extends UtilsService {
 
   async remove(id: string) {
     const artist = await this.findOne(id);
+
+    if (await this.favoritesService.findOne(id, 'artists', 'id')) {
+      this.favoritesService.removeArtist(id);
+    }
+
+    const artistTracks = await this.tracksService.findMany(id, 'artistId');
+    const artistAlbums = await this.albumsService.findMany(id, 'artistId');
+
+    artistTracks.forEach((track) => this.tracksService.update(track.id, { artistId: null }));
+    artistAlbums.forEach((album) => this.albumsService.update(album.id, { artistId: null }));
 
     const index = this.atrists.indexOf(artist);
 

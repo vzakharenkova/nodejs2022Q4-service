@@ -1,6 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { db } from 'src/database/db';
 import { FavoritesService } from 'src/favorites/favorites.service';
+import { TracksService } from 'src/tracks/tracks.service';
 import { UtilsService } from 'src/utils/utils.service';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -16,6 +17,9 @@ export class AlbumsService extends UtilsService {
   constructor(
     @Inject(forwardRef(() => FavoritesService))
     private favoritesService: FavoritesService,
+
+    @Inject(forwardRef(() => TracksService))
+    private tracksService: TracksService,
   ) {
     super();
   }
@@ -49,6 +53,12 @@ export class AlbumsService extends UtilsService {
     return album;
   }
 
+  async findMany(id: string, searchField: string): Promise<Album[]> {
+    this.validateId(id);
+
+    return this.albums.filter((album) => album[searchField] === id);
+  }
+
   async update(id: string, updateAlbumDto: UpdateAlbumDto): Promise<Album> {
     const album = await this.findOne(id);
 
@@ -61,6 +71,14 @@ export class AlbumsService extends UtilsService {
 
   async remove(id: string): Promise<void> {
     const album = await this.findOne(id);
+
+    if (await this.favoritesService.findOne(id, 'albums', 'id')) {
+      this.favoritesService.removeAlbum(id);
+    }
+
+    const albumTracks = await this.tracksService.findMany(id, 'albumId');
+
+    albumTracks.forEach((track) => this.tracksService.update(track.id, { albumId: null }));
 
     const index = this.albums.indexOf(album);
 

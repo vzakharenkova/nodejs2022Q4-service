@@ -1,7 +1,10 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AlbumsService } from 'src/albums/albums.service';
+import { Album } from 'src/albums/entities/album.entity';
 import { ArtistsService } from 'src/artists/artists.service';
+import { Artist } from 'src/artists/entities/artist.entity';
 import { db } from 'src/database/db';
+import { Track } from 'src/tracks/entities/track.entity';
 import { TracksService } from 'src/tracks/tracks.service';
 import { UtilsService } from 'src/utils/utils.service';
 import { Favorite } from './entities/favorite.entity';
@@ -45,6 +48,18 @@ export class FavoritesService extends UtilsService {
     this.favorites.artists.push(artist);
 
     return this.favorites.artists;
+  }
+
+  async findOne(
+    id: string,
+    searchEntity: string,
+    searchField: string,
+  ): Promise<Track[] | Album[] | Artist[]> {
+    this.validateId(id);
+
+    return this.favorites[searchEntity].find(
+      (el: Track | Album | Artist) => el[searchField] === id,
+    );
   }
 
   async findAll(): Promise<Favorite> {
