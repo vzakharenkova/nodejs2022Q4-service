@@ -6,7 +6,7 @@ import {
 
 @ValidatorConstraint({ name: 'null-or-string', async: false })
 export class IsNullOrString implements ValidatorConstraintInterface {
-  validate(text: any, _args: ValidationArguments) {
+  validate(text: any) {
     return text === null || typeof text === 'string';
   }
 
