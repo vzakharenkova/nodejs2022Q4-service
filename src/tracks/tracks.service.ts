@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -6,10 +6,19 @@ import { UtilsService } from 'src/utils/utils.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
+import { FavoritesService } from 'src/favorites/favorites.service';
+import { db } from 'src/database/db';
 
 @Injectable()
 export class TracksService extends UtilsService {
-  private readonly tracks: Track[] = [];
+  private readonly tracks: Track[] = db.tracks;
+
+  constructor(
+    @Inject(forwardRef(() => FavoritesService))
+    private favoritesService: FavoritesService,
+  ) {
+    super();
+  }
 
   async create(createTrackDto: CreateTrackDto): Promise<Track> {
     const track: Track = {
@@ -26,13 +35,15 @@ export class TracksService extends UtilsService {
     return this.tracks;
   }
 
-  async findOne(id: string): Promise<Track> {
+  async findOne(id: string, isFavs?: boolean): Promise<Track> {
     this.validateId(id);
 
     const track = this.tracks.find((track) => track.id === id);
 
     if (!track) {
-      this.throwNotFoundException('Track', id);
+      isFavs
+        ? this.throwUnprocessableEntityException('Track', id)
+        : this.throwNotFoundException('Track', id);
     }
 
     return track;

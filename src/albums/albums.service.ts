@@ -1,4 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { db } from 'src/database/db';
+import { FavoritesService } from 'src/favorites/favorites.service';
 import { UtilsService } from 'src/utils/utils.service';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -9,7 +11,14 @@ import { Album } from './entities/album.entity';
 
 @Injectable()
 export class AlbumsService extends UtilsService {
-  private readonly albums: Album[] = [];
+  private readonly albums: Album[] = db.albums;
+
+  constructor(
+    @Inject(forwardRef(() => FavoritesService))
+    private favoritesService: FavoritesService,
+  ) {
+    super();
+  }
 
   async create(createAlbumDto: CreateAlbumDto): Promise<Album> {
     const album: Album = {
@@ -26,13 +35,15 @@ export class AlbumsService extends UtilsService {
     return this.albums;
   }
 
-  async findOne(id: string): Promise<Album> {
+  async findOne(id: string, isFavs?: boolean): Promise<Album> {
     this.validateId(id);
 
     const album = this.albums.find((album) => album.id === id);
 
     if (!album) {
-      this.throwNotFoundException('Artist', id);
+      isFavs
+        ? this.throwUnprocessableEntityException('Album', id)
+        : this.throwNotFoundException('Album', id);
     }
 
     return album;

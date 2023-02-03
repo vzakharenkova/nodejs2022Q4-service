@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ForbiddenException } from '@nestjs/common/exceptions';
+import { db } from 'src/database/db';
 import { UtilsService } from 'src/utils/utils.service';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -10,7 +11,7 @@ import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService extends UtilsService {
-  private readonly users: User[] = [];
+  private readonly users: User[] = db.users;
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const timestamp = new Date().getTime();
