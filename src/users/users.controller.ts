@@ -8,6 +8,7 @@ import {
   UseFilters,
   Put,
   HttpCode,
+  UseInterceptors,
 } from '@nestjs/common';
 
 import { UsersService } from './users.service';
@@ -15,9 +16,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { HttpExceptionFilter } from 'src/utils/http-exception.filter';
 import { User } from './entities/user.entity';
+import { TransformInterceptor } from 'src/utils/transform.interceptor';
 
 @Controller('user')
 @UseFilters(new HttpExceptionFilter())
+@UseInterceptors(TransformInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
