@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString, IsNumber, Validate } from 'class-validator';
+
 import { IsNullOrString } from 'src/utils/validators';
 
 export class Track {
@@ -16,4 +17,12 @@ export class Track {
 
   @IsNumber()
   duration: number; // integer number
+}
+
+export enum TRACK_FIELDS {
+  ID = 'id',
+  NAME = 'name',
+  ALBUM_ID = 'albumId',
+  ARTIST_ID = 'artistId',
+  DURATION = 'duration',
 }

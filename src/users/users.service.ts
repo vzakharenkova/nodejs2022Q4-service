@@ -1,10 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { ForbiddenException } from '@nestjs/common/exceptions';
-import { db } from 'src/database/db';
-import { UtilsService } from 'src/utils/utils.service';
-
+import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
+import { db } from 'src/database/db';
+import { ENTITY, ENTITY_NAME } from 'src/utils/utils.model';
+import { UtilsService } from 'src/utils/utils.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -23,9 +22,7 @@ export class UsersService extends UtilsService {
       updatedAt: timestamp,
     };
 
-    this.users.push(user);
-
-    return user;
+    return <User>this.createElement(ENTITY.USERS, user);
   }
 
   async findAll(): Promise<User[]> {
@@ -33,36 +30,16 @@ export class UsersService extends UtilsService {
   }
 
   async findOne(id: string): Promise<User> {
-    this.validateId(id);
-
-    const user = this.users.find((user) => user.id === id);
-
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} is not found`);
-    }
-
-    return user;
+    return <User>this.findElement(ENTITY.USERS, id, 'id', ENTITY_NAME.USER);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.findOne(id);
-
-    if (updateUserDto.oldPassword !== user.password) {
-      throw new ForbiddenException('Old password is wrong');
-    }
-
-    user.password = updateUserDto.newPassword;
-    user.updatedAt = new Date().getTime();
-    ++user.version;
-
-    return user;
+    return <User>this.updateElement(ENTITY.USERS, id, ENTITY_NAME.USER, updateUserDto);
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<void> {
     const user = await this.findOne(id);
 
-    const index = this.users.indexOf(user);
-
-    this.users.splice(index, 1);
+    return this.removeElement(ENTITY.USERS, user);
   }
 }

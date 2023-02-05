@@ -1,22 +1,11 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Put,
-  Param,
-  Delete,
-  UseFilters,
-  HttpCode,
-} from '@nestjs/common';
-import { HttpExceptionFilter } from 'src/utils/http-exception.filter';
+import { Controller, Get, Post, Body, Put, Param, Delete, HttpCode } from '@nestjs/common';
+
 import { ArtistsService } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
 
 @Controller('artist')
-@UseFilters(new HttpExceptionFilter())
 export class ArtistsController {
   constructor(private readonly artistsService: ArtistsService) {}
 
@@ -36,13 +25,13 @@ export class ArtistsController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateArtistDto: UpdateArtistDto) {
+  update(@Param('id') id: string, @Body() updateArtistDto: UpdateArtistDto): Promise<Artist> {
     return this.artistsService.update(id, updateArtistDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string): Promise<void> {
     return this.artistsService.remove(id);
   }
 }

@@ -1,4 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+
 import { AlbumsService } from 'src/albums/albums.service';
 import { Album } from 'src/albums/entities/album.entity';
 import { ArtistsService } from 'src/artists/artists.service';
@@ -6,12 +7,19 @@ import { Artist } from 'src/artists/entities/artist.entity';
 import { db } from 'src/database/db';
 import { Track } from 'src/tracks/entities/track.entity';
 import { TracksService } from 'src/tracks/tracks.service';
+import { ENTITY, ENTITY_NAME } from 'src/utils/utils.model';
 import { UtilsService } from 'src/utils/utils.service';
 import { Favorite } from './entities/favorite.entity';
 
 @Injectable()
 export class FavoritesService extends UtilsService {
   private readonly favorites: Favorite = db.favorites;
+
+  private readonly serviceMap = {
+    [ENTITY.ALBUMS]: this.albumsService,
+    [ENTITY.ARTISTS]: this.artistsService,
+    [ENTITY.TRACKS]: this.tracksService,
+  };
 
   constructor(
     @Inject(forwardRef(() => TracksService))
@@ -26,35 +34,19 @@ export class FavoritesService extends UtilsService {
     super();
   }
 
-  async addTrack(id: string) {
-    const track = await this.tracksService.findOne(id, true);
+  async add(entity: ENTITY, id: string): Promise<Album[] | Artist[] | Track[]> {
+    const element: Album[] | Artist[] | Track[] = await this.serviceMap[entity].findOne(id, true);
 
-    this.favorites.tracks.push(track);
+    this.favorites[entity].push(element);
 
-    return this.favorites.tracks;
-  }
-
-  async addAlbum(id: string) {
-    const album = await this.albumsService.findOne(id, true);
-
-    this.favorites.albums.push(album);
-
-    return this.favorites.albums;
-  }
-
-  async addArtist(id: string) {
-    const artist = await this.artistsService.findOne(id, true);
-
-    this.favorites.artists.push(artist);
-
-    return this.favorites.artists;
+    return this.favorites[entity];
   }
 
   async findOne(
     id: string,
     searchEntity: string,
     searchField: string,
-  ): Promise<Track[] | Album[] | Artist[]> {
+  ): Promise<Track | Album | Artist> {
     this.validateId(id);
 
     return this.favorites[searchEntity].find(
@@ -66,45 +58,13 @@ export class FavoritesService extends UtilsService {
     return this.favorites;
   }
 
-  async removeTrack(id: string) {
-    this.validateId(id);
+  async remove(entity: ENTITY, id: string, entityName: ENTITY_NAME): Promise<void> {
+    const element = await this.findOne(id, entity, 'id');
 
-    const track = this.favorites.tracks.find((track) => track.id === id);
-
-    if (!track) {
-      this.throwNotFoundException('Track', id);
+    if (!element) {
+      this.throwNotFoundException(entityName, id);
     }
 
-    const index = this.favorites.tracks.indexOf(track);
-
-    this.favorites.tracks.splice(index, 1);
-  }
-
-  async removeAlbum(id: string) {
-    this.validateId(id);
-
-    const album = this.favorites.albums.find((album) => album.id === id);
-
-    if (!album) {
-      this.throwNotFoundException('Album', id);
-    }
-
-    const index = this.favorites.albums.indexOf(album);
-
-    this.favorites.albums.splice(index, 1);
-  }
-
-  async removeArtist(id: string) {
-    this.validateId(id);
-
-    const artist = this.favorites.artists.find((artist) => artist.id === id);
-
-    if (!artist) {
-      this.throwNotFoundException('Artist', id);
-    }
-
-    const index = this.favorites.artists.indexOf(artist);
-
-    this.favorites.artists.splice(index, 1);
+    this.removeElement(entity, element, true);
   }
 }

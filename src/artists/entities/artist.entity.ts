@@ -11,3 +11,9 @@ export class Artist {
   @IsBoolean()
   grammy: boolean;
 }
+
+export enum ARTIST_FIELDS {
+  ID = 'id',
+  NAME = 'name',
+  GRAMMY = 'grammy',
+}

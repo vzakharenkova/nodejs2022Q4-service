@@ -1,5 +1,4 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-
 import { v4 as uuidv4 } from 'uuid';
 
 import { UtilsService } from 'src/utils/utils.service';
@@ -10,6 +9,9 @@ import { db } from 'src/database/db';
 import { FavoritesService } from 'src/favorites/favorites.service';
 import { AlbumsService } from 'src/albums/albums.service';
 import { TracksService } from 'src/tracks/tracks.service';
+import { ENTITY, ENTITY_NAME } from 'src/utils/utils.model';
+import { ALBUM_FIELDS } from 'src/albums/entities/album.entity';
+import { TRACK_FIELDS } from 'src/tracks/entities/track.entity';
 
 @Injectable()
 export class ArtistsService extends UtilsService {
@@ -34,9 +36,7 @@ export class ArtistsService extends UtilsService {
       ...createArtistDto,
     };
 
-    this.atrists.push(artist);
-
-    return artist;
+    return <Artist>this.createElement(ENTITY.ARTISTS, artist);
   }
 
   async findAll(): Promise<Artist[]> {
@@ -44,44 +44,26 @@ export class ArtistsService extends UtilsService {
   }
 
   async findOne(id: string, isFavs?: boolean): Promise<Artist> {
-    this.validateId(id);
-
-    const artist = this.atrists.find((artist) => artist.id === id);
-
-    if (!artist) {
-      isFavs
-        ? this.throwUnprocessableEntityException('Artist', id)
-        : this.throwNotFoundException('Artist', id);
-    }
-
-    return artist;
+    return <Artist>this.findElement(ENTITY.ARTISTS, id, 'id', ENTITY_NAME.ARTIST, isFavs);
   }
 
-  async update(id: string, updateArtistDto: UpdateArtistDto) {
-    const artist = await this.findOne(id);
-
-    const keys = Object.keys(updateArtistDto);
-
-    keys.forEach((key) => (artist[key] = updateArtistDto[key]));
-
-    return artist;
+  async update(id: string, updateArtistDto: UpdateArtistDto): Promise<Artist> {
+    return <Artist>this.updateElement(ENTITY.ARTISTS, id, ENTITY_NAME.ARTIST, updateArtistDto);
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<void> {
     const artist = await this.findOne(id);
 
     if (await this.favoritesService.findOne(id, 'artists', 'id')) {
-      this.favoritesService.removeArtist(id);
+      this.favoritesService.remove(ENTITY.ARTISTS, id, ENTITY_NAME.ARTIST);
     }
 
-    const artistTracks = await this.tracksService.findMany(id, 'artistId');
-    const artistAlbums = await this.albumsService.findMany(id, 'artistId');
+    const artistTracks = await this.tracksService.findMany(id, TRACK_FIELDS.ARTIST_ID);
+    const artistAlbums = await this.albumsService.findMany(id, ALBUM_FIELDS.ARTIST_ID);
 
     artistTracks.forEach((track) => this.tracksService.update(track.id, { artistId: null }));
     artistAlbums.forEach((album) => this.albumsService.update(album.id, { artistId: null }));
 
-    const index = this.atrists.indexOf(artist);
-
-    this.atrists.splice(index, 1);
+    this.removeElement(ENTITY.ARTISTS, artist);
   }
 }

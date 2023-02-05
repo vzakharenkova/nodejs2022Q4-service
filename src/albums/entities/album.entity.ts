@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsNumber, IsString, Validate } from 'class-validator';
+
 import { IsNullOrString } from 'src/utils/validators';
 
 export class Album {
@@ -14,4 +15,11 @@ export class Album {
 
   @Validate(IsNullOrString)
   artistId: string | null; // refers to Artist
+}
+
+export enum ALBUM_FIELDS {
+  ID = 'id',
+  NAME = 'name',
+  YEAR = 'year',
+  ARTIST_ID = 'artistId',
 }

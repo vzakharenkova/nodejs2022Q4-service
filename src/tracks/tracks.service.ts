@@ -1,13 +1,13 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-
 import { v4 as uuidv4 } from 'uuid';
 
 import { UtilsService } from 'src/utils/utils.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { Track } from './entities/track.entity';
+import { Track, TRACK_FIELDS } from './entities/track.entity';
 import { FavoritesService } from 'src/favorites/favorites.service';
 import { db } from 'src/database/db';
+import { ENTITY, ENTITY_NAME } from 'src/utils/utils.model';
 
 @Injectable()
 export class TracksService extends UtilsService {
@@ -26,9 +26,7 @@ export class TracksService extends UtilsService {
       ...createTrackDto,
     };
 
-    this.tracks.push(track);
-
-    return track;
+    return <Track>this.createElement(ENTITY.TRACKS, track);
   }
 
   async findAll(): Promise<Track[]> {
@@ -36,44 +34,27 @@ export class TracksService extends UtilsService {
   }
 
   async findOne(id: string, isFavs?: boolean): Promise<Track> {
-    this.validateId(id);
-
-    const track = this.tracks.find((track) => track.id === id);
-
-    if (!track) {
-      isFavs
-        ? this.throwUnprocessableEntityException('Track', id)
-        : this.throwNotFoundException('Track', id);
-    }
-
-    return track;
+    return <Track>this.findElement(ENTITY.TRACKS, id, 'id', ENTITY_NAME.TRACK, isFavs);
   }
 
-  async findMany(id: string, searchField: string): Promise<Track[]> {
-    this.validateId(id);
-
-    return this.tracks.filter((track) => track[searchField] === id);
+  async findMany(
+    id: string,
+    searchField: TRACK_FIELDS.ARTIST_ID | TRACK_FIELDS.ALBUM_ID | TRACK_FIELDS.ID,
+  ): Promise<Track[]> {
+    return <Track[]>this.findElementsByCriterium(ENTITY.TRACKS, id, searchField);
   }
 
   async update(id: string, updateTrackDto: UpdateTrackDto): Promise<Track> {
-    const track = await this.findOne(id);
-
-    const keys = Object.keys(updateTrackDto);
-
-    keys.forEach((key) => (track[key] = updateTrackDto[key]));
-
-    return track;
+    return <Track>this.updateElement(ENTITY.TRACKS, id, ENTITY_NAME.TRACK, updateTrackDto);
   }
 
   async remove(id: string): Promise<void> {
     const track = await this.findOne(id);
 
-    if (await this.favoritesService.findOne(id, 'tracks', 'id')) {
-      this.favoritesService.removeTrack(id);
+    if (await this.favoritesService.findOne(id, ENTITY.TRACKS, TRACK_FIELDS.ID)) {
+      this.favoritesService.remove(ENTITY.TRACKS, id, ENTITY_NAME.TRACK);
     }
 
-    const index = this.tracks.indexOf(track);
-
-    this.tracks.splice(index, 1);
+    this.removeElement(ENTITY.TRACKS, track);
   }
 }
