@@ -1,0 +1,26 @@
+version: '3.4'
+
+services:
+  homelibrary:
+    image: homelibrary
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: ${PORT}
+    depends_on:
+      - postgres
+    ports:
+      - ${PORT}:${PORT}
+  postgres:
+    image: postgres
+    build:
+      context: .
+      dockerfile: ./src/database/Dockerfile
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
