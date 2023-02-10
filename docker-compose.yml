@@ -1,0 +1,36 @@
+version: '3.4'
+
+services:
+  homelibrary:
+    image: vika1999/homelibrary
+    volumes:
+      - .:/usr/app/
+    networks:
+      - homelibrary-net
+    working_dir: /usr/app
+    environment:
+      NODE_ENV: production
+      PORT: ${PORT}
+    depends_on:
+      - postgres
+    restart: always
+    ports:
+      - ${PORT}:${PORT}
+  postgres:
+    image: vika1999/postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - homelibrary-net
+    restart: always
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+volumes:
+  db-data:
+networks:
+  homelibrary-net:
+    driver: bridge

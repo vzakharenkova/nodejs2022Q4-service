@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, IsNumber, Validate } from 'class-validator';
 
-import { IsNullOrString } from 'src/utils/validators';
+import { IsNullOrString } from '../../utils/validators';
 
 export class Track {
   readonly id: string; // uuid v4

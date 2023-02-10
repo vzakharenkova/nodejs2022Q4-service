@@ -1,14 +1,14 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
-import { AlbumsService } from 'src/albums/albums.service';
-import { Album } from 'src/albums/entities/album.entity';
-import { ArtistsService } from 'src/artists/artists.service';
-import { Artist } from 'src/artists/entities/artist.entity';
-import { db } from 'src/database/db';
-import { Track } from 'src/tracks/entities/track.entity';
-import { TracksService } from 'src/tracks/tracks.service';
-import { ENTITY, ENTITY_NAME } from 'src/utils/utils.model';
-import { UtilsService } from 'src/utils/utils.service';
+import { AlbumsService } from '../albums/albums.service';
+import { Album } from '../albums/entities/album.entity';
+import { ArtistsService } from '../artists/artists.service';
+import { Artist } from '../artists/entities/artist.entity';
+import { db } from '../database/db';
+import { Track } from '../tracks/entities/track.entity';
+import { TracksService } from '../tracks/tracks.service';
+import { ENTITY, ENTITY_NAME } from '../utils/utils.model';
+import { UtilsService } from '../utils/utils.service';
 import { Favorite } from './entities/favorite.entity';
 
 @Injectable()

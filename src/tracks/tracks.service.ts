@@ -1,13 +1,13 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
-import { UtilsService } from 'src/utils/utils.service';
+import { db } from '../database/db';
+import { ENTITY, ENTITY_NAME } from '../utils/utils.model';
+import { UtilsService } from '../utils/utils.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track, TRACK_FIELDS } from './entities/track.entity';
-import { FavoritesService } from 'src/favorites/favorites.service';
-import { db } from 'src/database/db';
-import { ENTITY, ENTITY_NAME } from 'src/utils/utils.model';
+import { FavoritesService } from '../favorites/favorites.service';
 
 @Injectable()
 export class TracksService extends UtilsService {

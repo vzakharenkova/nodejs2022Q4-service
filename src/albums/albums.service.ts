@@ -1,12 +1,12 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
-import { db } from 'src/database/db';
-import { FavoritesService } from 'src/favorites/favorites.service';
-import { TRACK_FIELDS } from 'src/tracks/entities/track.entity';
-import { TracksService } from 'src/tracks/tracks.service';
-import { ENTITY, ENTITY_NAME } from 'src/utils/utils.model';
-import { UtilsService } from 'src/utils/utils.service';
+import { db } from '../database/db';
+import { FavoritesService } from '../favorites/favorites.service';
+import { TRACK_FIELDS } from '../tracks/entities/track.entity';
+import { TracksService } from '../tracks/tracks.service';
+import { ENTITY, ENTITY_NAME } from '../utils/utils.model';
+import { UtilsService } from '../utils/utils.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album, ALBUM_FIELDS } from './entities/album.entity';

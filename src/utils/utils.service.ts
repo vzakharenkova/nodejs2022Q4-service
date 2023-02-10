@@ -7,9 +7,9 @@ import {
 } from '@nestjs/common';
 import { validate as validateUUID } from 'uuid';
 
-import { db } from 'src/database/db';
-import { UpdateUserDto } from 'src/users/dto/update-user.dto';
-import { User, USER_FIELDS } from 'src/users/entities/user.entity';
+import { db } from '../database/db';
+import { UpdateUserDto } from '../users/dto/update-user.dto';
+import { User, USER_FIELDS } from '../users/entities/user.entity';
 import {
   ENTITY,
   ENTITY_NAME,

@@ -1,17 +1,17 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
-import { UtilsService } from 'src/utils/utils.service';
+import { UtilsService } from '../utils/utils.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
-import { db } from 'src/database/db';
-import { FavoritesService } from 'src/favorites/favorites.service';
-import { AlbumsService } from 'src/albums/albums.service';
-import { TracksService } from 'src/tracks/tracks.service';
-import { ENTITY, ENTITY_NAME } from 'src/utils/utils.model';
-import { ALBUM_FIELDS } from 'src/albums/entities/album.entity';
-import { TRACK_FIELDS } from 'src/tracks/entities/track.entity';
+import { db } from '../database/db';
+import { FavoritesService } from '../favorites/favorites.service';
+import { AlbumsService } from '../albums/albums.service';
+import { TracksService } from '../tracks/tracks.service';
+import { ENTITY, ENTITY_NAME } from '../utils/utils.model';
+import { ALBUM_FIELDS } from '../albums/entities/album.entity';
+import { TRACK_FIELDS } from '../tracks/entities/track.entity';
 
 @Injectable()
 export class ArtistsService extends UtilsService {

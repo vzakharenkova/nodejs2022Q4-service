@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString, Validate } from 'class-validator';
 
-import { IsNullOrString } from 'src/utils/validators';
+import { IsNullOrString } from '../../utils/validators';
 
 export class Album {
   readonly id: string; // uuid v4
