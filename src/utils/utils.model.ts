@@ -1,11 +1,11 @@
-import { UpdateAlbumDto } from 'src/albums/dto/update-album.dto';
-import { Album } from 'src/albums/entities/album.entity';
-import { UpdateArtistDto } from 'src/artists/dto/update-artist.dto';
-import { Artist } from 'src/artists/entities/artist.entity';
-import { UpdateTrackDto } from 'src/tracks/dto/update-track.dto';
-import { Track } from 'src/tracks/entities/track.entity';
-import { UpdateUserDto } from 'src/users/dto/update-user.dto';
-import { User } from 'src/users/entities/user.entity';
+import { UpdateAlbumDto } from '../albums/dto/update-album.dto';
+import { Album } from '../albums/entities/album.entity';
+import { UpdateArtistDto } from '../artists/dto/update-artist.dto';
+import { Artist } from '../artists/entities/artist.entity';
+import { UpdateTrackDto } from '../tracks/dto/update-track.dto';
+import { Track } from '../tracks/entities/track.entity';
+import { UpdateUserDto } from '../users/dto/update-user.dto';
+import { User } from '../users/entities/user.entity';
 
 export enum ENTITY {
   ALBUMS = 'albums',

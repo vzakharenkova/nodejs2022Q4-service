@@ -2,10 +2,10 @@ import { Controller, Get, Post, Param, Delete, HttpCode } from '@nestjs/common';
 
 import { FavoritesService } from './favorites.service';
 import { Favorite } from './entities/favorite.entity';
-import { Artist } from 'src/artists/entities/artist.entity';
-import { Album } from 'src/albums/entities/album.entity';
-import { Track } from 'src/tracks/entities/track.entity';
-import { ENTITY, ENTITY_NAME } from 'src/utils/utils.model';
+import { Artist } from '../artists/entities/artist.entity';
+import { Album } from '../albums/entities/album.entity';
+import { Track } from '../tracks/entities/track.entity';
+import { ENTITY, ENTITY_NAME } from '../utils/utils.model';
 
 @Controller('favs')
 export class FavoritesController {

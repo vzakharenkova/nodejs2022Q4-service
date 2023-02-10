@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
-import { db } from 'src/database/db';
-import { ENTITY, ENTITY_NAME } from 'src/utils/utils.model';
-import { UtilsService } from 'src/utils/utils.service';
+import { db } from '../database/db';
+import { ENTITY, ENTITY_NAME } from '../utils/utils.model';
+import { UtilsService } from '../utils/utils.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
