@@ -64,6 +64,6 @@ export class AlbumsService extends UtilsService {
 
     // albumTracks.forEach((track) => this.tracksService.update(track.id, { albumId: null }));
 
-    this.removeElement(this.albumsRepository, album);
+    await this.removeElement(this.albumsRepository, album);
   }
 }

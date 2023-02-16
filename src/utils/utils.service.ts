@@ -82,7 +82,7 @@ export class UtilsService {
   ): Promise<void> {
     // const element_DB: UNION_ENTITIES_LIST = fromFavs ? this.db.favorites[entity] : this.db[entity];
 
-    repository.remove(element);
+    await repository.remove(element);
 
     // const index = element_DB.indexOf(element);
 
@@ -110,7 +110,7 @@ export class UtilsService {
 
     if (USER_FIELDS.PASSWORD in element) {
       if ((<UpdateUserDto>updateDto).oldPassword !== element.password) {
-        throw new ForbiddenException(`${element instanceof User}`);
+        throw new ForbiddenException('Old password is wrong');
       }
 
       element.password = (<UpdateUserDto>updateDto).newPassword;
@@ -122,6 +122,6 @@ export class UtilsService {
       keys.forEach((key) => (element[key] = updateDto[key]));
     }
 
-    return element;
+    return await repository.save(element);
   }
 }
