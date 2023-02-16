@@ -15,29 +15,27 @@ import { Favorite } from './entities/favorite.entity';
 export class FavoritesService extends UtilsService {
   private readonly favorites: Favorite = db.favorites;
 
-  private readonly serviceMap = {
-    [ENTITY.ALBUMS]: this.albumsService,
-    [ENTITY.ARTISTS]: this.artistsService,
-    [ENTITY.TRACKS]: this.tracksService,
-  };
+  //   private readonly serviceMap = {
+  //     [ENTITY.ALBUMS]: this.albumsService,
+  //     [ENTITY.ARTISTS]: this.artistsService,
+  //     [ENTITY.TRACKS]: this.tracksService,
+  //   };
 
-  constructor(
-    @Inject(forwardRef(() => TracksService))
-    private tracksService: TracksService,
+  constructor() // private tracksService: TracksService, // @Inject(forwardRef(() => TracksService))
 
-    @Inject(forwardRef(() => AlbumsService))
-    private albumsService: AlbumsService,
+  // @Inject(forwardRef(() => AlbumsService))
+  // private albumsService: AlbumsService,
 
-    @Inject(forwardRef(() => ArtistsService))
-    private artistsService: ArtistsService,
-  ) {
+  // @Inject(forwardRef(() => ArtistsService))
+  // private artistsService: ArtistsService,
+  {
     super();
   }
 
   async add(entity: ENTITY, id: string): Promise<Album[] | Artist[] | Track[]> {
-    const element: Album[] | Artist[] | Track[] = await this.serviceMap[entity].findOne(id, true);
+    // const element: Album[] | Artist[] | Track[] = await this.serviceMap[entity].findOne(id, true);
 
-    this.favorites[entity].push(element);
+    // this.favorites[entity].push(element);
 
     return this.favorites[entity];
   }
@@ -65,6 +63,6 @@ export class FavoritesService extends UtilsService {
       this.throwNotFoundException(entityName, id);
     }
 
-    this.removeElement(entity, element, true);
+    // this.removeElement(entity, element, true);
   }
 }

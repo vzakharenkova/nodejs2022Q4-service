@@ -1,10 +1,9 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { db } from '../database/db';
-import { FavoritesService } from '../favorites/favorites.service';
-import { TRACK_FIELDS } from '../tracks/entities/track.entity';
-import { TracksService } from '../tracks/tracks.service';
 import { ENTITY, ENTITY_NAME } from '../utils/utils.model';
 import { UtilsService } from '../utils/utils.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
@@ -16,11 +15,8 @@ export class AlbumsService extends UtilsService {
   private readonly albums: Album[] = db.albums;
 
   constructor(
-    @Inject(forwardRef(() => FavoritesService))
-    private favoritesService: FavoritesService,
-
-    @Inject(forwardRef(() => TracksService))
-    private tracksService: TracksService,
+    @InjectRepository(Album)
+    private albumsRepository: Repository<Album>, // @Inject(forwardRef(() => FavoritesService)) // private favoritesService: FavoritesService, // @Inject(forwardRef(() => TracksService)) // private tracksService: TracksService,
   ) {
     super();
   }
@@ -31,15 +27,17 @@ export class AlbumsService extends UtilsService {
       ...createAlbumDto,
     };
 
-    return <Album>this.createElement(ENTITY.ALBUMS, album);
+    return await (<Promise<Album>>this.createElement(this.albumsRepository, album));
   }
 
   async findAll(): Promise<Album[]> {
-    return this.albums;
+    return await (<Promise<Album[]>>this.findAllElements(this.albumsRepository));
   }
 
   async findOne(id: string, isFavs?: boolean): Promise<Album> {
-    return <Album>this.findElement(ENTITY.ALBUMS, id, 'id', ENTITY_NAME.ALBUM, isFavs);
+    return await (<Promise<Album>>(
+      this.findElement(this.albumsRepository, id, ENTITY_NAME.ALBUM, isFavs)
+    ));
   }
 
   async findMany(
@@ -50,20 +48,22 @@ export class AlbumsService extends UtilsService {
   }
 
   async update(id: string, updateAlbumDto: UpdateAlbumDto): Promise<Album> {
-    return <Album>this.updateElement(ENTITY.ALBUMS, id, ENTITY_NAME.ALBUM, updateAlbumDto);
+    return await (<Promise<Album>>(
+      this.updateElement(this.albumsRepository, id, ENTITY_NAME.ALBUM, updateAlbumDto)
+    ));
   }
 
   async remove(id: string): Promise<void> {
     const album = await this.findOne(id);
 
-    if (await this.favoritesService.findOne(id, 'albums', 'id')) {
-      this.favoritesService.remove(ENTITY.ALBUMS, id, ENTITY_NAME.ALBUM);
-    }
+    // if (await this.favoritesService.findOne(id, 'albums', 'id')) {
+    //   this.favoritesService.remove(ENTITY.ALBUMS, id, ENTITY_NAME.ALBUM);
+    // }
 
-    const albumTracks = await this.tracksService.findMany(id, TRACK_FIELDS.ALBUM_ID);
+    // const albumTracks = await this.tracksService.findMany(id, TRACK_FIELDS.ALBUM_ID);
 
-    albumTracks.forEach((track) => this.tracksService.update(track.id, { albumId: null }));
+    // albumTracks.forEach((track) => this.tracksService.update(track.id, { albumId: null }));
 
-    this.removeElement(ENTITY.ALBUMS, album);
+    this.removeElement(this.albumsRepository, album);
   }
 }
