@@ -18,11 +18,11 @@ export class Artist {
   @IsBoolean()
   grammy: boolean;
 
-  //   @OneToMany(() => Album, (album) => album.artist)
-  //   albums: Album[];
+  @OneToMany(() => Album, (album) => album.artist)
+  albums: Album[];
 
-  //   @OneToMany(() => Track, (track) => track.artist)
-  //   tracks: Track[];
+  @OneToMany(() => Track, (track) => track.artist)
+  tracks: Track[];
 }
 
 export enum ARTIST_FIELDS {

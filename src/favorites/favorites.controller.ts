@@ -13,17 +13,17 @@ export class FavoritesController {
 
   @Post('track/:id')
   createTrackFav(@Param('id') id: string): Promise<Track[]> {
-    return <Promise<Track[]>>this.favoritesService.add(ENTITY.TRACKS, id);
+    return <Promise<Track[]>>this.favoritesService.add(ENTITY.TRACKS, id, ENTITY_NAME.TRACK);
   }
 
   @Post('album/:id')
   createAlbumFav(@Param('id') id: string): Promise<Album[]> {
-    return <Promise<Album[]>>this.favoritesService.add(ENTITY.ALBUMS, id);
+    return <Promise<Album[]>>this.favoritesService.add(ENTITY.ALBUMS, id, ENTITY_NAME.ALBUM);
   }
 
   @Post('artist/:id')
   createArtistFav(@Param('id') id: string): Promise<Artist[]> {
-    return <Promise<Artist[]>>this.favoritesService.add(ENTITY.ARTISTS, id);
+    return <Promise<Artist[]>>this.favoritesService.add(ENTITY.ARTISTS, id, ENTITY_NAME.ARTIST);
   }
 
   @Get()

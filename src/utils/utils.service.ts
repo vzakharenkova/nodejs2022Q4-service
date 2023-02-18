@@ -8,21 +8,12 @@ import {
 import { Repository } from 'typeorm';
 import { validate as validateUUID } from 'uuid';
 
-import { db } from '../database/db';
 import { UpdateUserDto } from '../users/dto/update-user.dto';
-import { User, USER_FIELDS } from '../users/entities/user.entity';
-import {
-  ENTITY,
-  ENTITY_NAME,
-  UNION_ENTITIES,
-  UNION_ENTITIES_LIST,
-  UNION_UPDATE_DTO,
-} from './utils.model';
+import { USER_FIELDS } from '../users/entities/user.entity';
+import { ENTITY_NAME, UNION_ENTITIES, UNION_ENTITIES_LIST, UNION_UPDATE_DTO } from './utils.model';
 
 @Injectable()
 export class UtilsService {
-  private readonly db = db;
-
   validateId(id: string): void {
     const isValidId = validateUUID(id);
 
@@ -62,31 +53,11 @@ export class UtilsService {
     return element;
   }
 
-  findElementsByCriterium(
-    entity: ENTITY,
-    id: string,
-    searchField: string,
-    inFavs?: boolean,
-  ): UNION_ENTITIES_LIST {
-    this.validateId(id);
-
-    const element_DB: UNION_ENTITIES_LIST = inFavs ? this.db.favorites[entity] : this.db[entity];
-
-    return element_DB.filter((element) => element[searchField] === id);
-  }
-
   async removeElement(
     repository: Repository<UNION_ENTITIES>,
     element: UNION_ENTITIES,
-    fromFavs?: boolean,
   ): Promise<void> {
-    // const element_DB: UNION_ENTITIES_LIST = fromFavs ? this.db.favorites[entity] : this.db[entity];
-
     await repository.remove(element);
-
-    // const index = element_DB.indexOf(element);
-
-    // element_DB.splice(index, 1);
   }
 
   async createElement(
@@ -94,8 +65,6 @@ export class UtilsService {
     element: UNION_ENTITIES,
   ): Promise<UNION_ENTITIES> {
     const createdElement = repository.create(element);
-
-    // return <User>this.createElement(ENTITY.USERS, user);
 
     return await repository.save(createdElement);
   }

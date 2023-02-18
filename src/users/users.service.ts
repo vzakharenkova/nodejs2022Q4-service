@@ -3,8 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { Repository } from 'typeorm';
 
-import { db } from '../database/db';
-import { ENTITY, ENTITY_NAME } from '../utils/utils.model';
+import { ENTITY_NAME } from '../utils/utils.model';
 import { UtilsService } from '../utils/utils.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -12,8 +11,6 @@ import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService extends UtilsService {
-  private readonly users: User[] = db.users;
-
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,

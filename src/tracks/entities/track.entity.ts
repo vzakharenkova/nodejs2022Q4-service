@@ -27,13 +27,13 @@ export class Track {
   @IsNumber()
   duration: number; // integer number
 
-  //   @ManyToOne(() => Artist, (artist) => artist.tracks)
-  //   @JoinColumn({ name: 'artistId' })
-  //   artist: Artist;
+  @ManyToOne(() => Artist, (artist) => artist.tracks, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'artistId' })
+  artist: Artist;
 
-  //   @ManyToOne(() => Album, (album) => album.tracks)
-  //   @JoinColumn({ name: 'albumId' })
-  //   album: Album;
+  @ManyToOne(() => Album, (album) => album.tracks, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'albumId' })
+  album: Album;
 }
 
 export enum TRACK_FIELDS {

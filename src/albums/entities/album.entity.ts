@@ -25,12 +25,12 @@ export class Album {
   @Validate(IsNullOrString)
   artistId: string | null; // refers to Artist
 
-  //   @ManyToOne(() => Artist, (artist) => artist.albums)
-  //   @JoinColumn({ name: 'artistId' })
-  //   artist: Artist;
+  @ManyToOne(() => Artist, (artist) => artist.albums, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'artistId' })
+  artist: Artist;
 
-  //   @OneToMany(() => Track, (track) => track.album)
-  //   tracks: Track[];
+  @OneToMany(() => Track, (track) => track.album)
+  tracks: Track[];
 }
 
 export enum ALBUM_FIELDS {
