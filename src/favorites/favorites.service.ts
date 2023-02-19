@@ -1,70 +1,94 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
-import { AlbumsService } from '../albums/albums.service';
 import { Album } from '../albums/entities/album.entity';
-import { ArtistsService } from '../artists/artists.service';
 import { Artist } from '../artists/entities/artist.entity';
-import { db } from '../database/db';
+
 import { Track } from '../tracks/entities/track.entity';
-import { TracksService } from '../tracks/tracks.service';
-import { ENTITY, ENTITY_NAME } from '../utils/utils.model';
+import { ENTITY, ENTITY_NAME, UNION_ENTITIES } from '../utils/utils.model';
 import { UtilsService } from '../utils/utils.service';
 import { Favorite } from './entities/favorite.entity';
 
 @Injectable()
 export class FavoritesService extends UtilsService {
-  private readonly favorites: Favorite = db.favorites;
-
-  private readonly serviceMap = {
-    [ENTITY.ALBUMS]: this.albumsService,
-    [ENTITY.ARTISTS]: this.artistsService,
-    [ENTITY.TRACKS]: this.tracksService,
+  private readonly repositoryMap = {
+    [ENTITY.ALBUMS]: this.albumsRepository,
+    [ENTITY.ARTISTS]: this.artistsRepository,
+    [ENTITY.TRACKS]: this.tracksRepository,
   };
 
   constructor(
-    @Inject(forwardRef(() => TracksService))
-    private tracksService: TracksService,
-
-    @Inject(forwardRef(() => AlbumsService))
-    private albumsService: AlbumsService,
-
-    @Inject(forwardRef(() => ArtistsService))
-    private artistsService: ArtistsService,
+    @InjectRepository(Favorite)
+    private favsRepository: Repository<Favorite>,
+    @InjectRepository(Artist)
+    private artistsRepository: Repository<Artist>,
+    @InjectRepository(Album)
+    private albumsRepository: Repository<Album>,
+    @InjectRepository(Track)
+    private tracksRepository: Repository<Track>,
   ) {
     super();
   }
 
-  async add(entity: ENTITY, id: string): Promise<Album[] | Artist[] | Track[]> {
-    const element: Album[] | Artist[] | Track[] = await this.serviceMap[entity].findOne(id, true);
-
-    this.favorites[entity].push(element);
-
-    return this.favorites[entity];
+  async initFavs() {
+    await this.favsRepository.save(new Favorite());
   }
 
-  async findOne(
-    id: string,
-    searchEntity: string,
-    searchField: string,
-  ): Promise<Track | Album | Artist> {
+  async add(entity: ENTITY, id: string, name: ENTITY_NAME): Promise<Album[] | Artist[] | Track[]> {
+    const element: UNION_ENTITIES = await this.findElement(
+      this.repositoryMap[entity],
+      id,
+      name,
+      true,
+    );
+
+    const favs = await this.findAll();
+
+    favs[entity].push(element);
+
+    await this.favsRepository.save(favs);
+
+    return favs[entity];
+  }
+
+  findIndex(id: string, favsGroupe: Track[] | Album[] | Artist[]): number {
     this.validateId(id);
 
-    return this.favorites[searchEntity].find(
-      (el: Track | Album | Artist) => el[searchField] === id,
-    );
+    return favsGroupe.findIndex((el: Track | Album | Artist) => el.id === id);
   }
 
   async findAll(): Promise<Favorite> {
-    return this.favorites;
+    const [favs] = await this.favsRepository.find({
+      relations: {
+        tracks: true,
+        albums: true,
+        artists: true,
+      },
+    });
+
+    if (!favs) {
+      await this.initFavs();
+      return this.findAll();
+    }
+
+    if (!favs) {
+      await this.favsRepository.save(new Favorite());
+    }
+
+    return favs;
   }
 
   async remove(entity: ENTITY, id: string, entityName: ENTITY_NAME): Promise<void> {
-    const element = await this.findOne(id, entity, 'id');
+    const favs = await this.findAll();
+    const elementIndex = this.findIndex(id, favs[entity]);
 
-    if (!element) {
+    if (elementIndex < 0) {
       this.throwNotFoundException(entityName, id);
     }
 
-    this.removeElement(entity, element, true);
+    favs[entity].splice(elementIndex, 1);
+
+    await this.favsRepository.save(favs);
   }
 }

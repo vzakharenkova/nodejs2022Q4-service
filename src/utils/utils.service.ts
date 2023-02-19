@@ -5,23 +5,15 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { Repository } from 'typeorm';
 import { validate as validateUUID } from 'uuid';
 
-import { db } from '../database/db';
 import { UpdateUserDto } from '../users/dto/update-user.dto';
-import { User, USER_FIELDS } from '../users/entities/user.entity';
-import {
-  ENTITY,
-  ENTITY_NAME,
-  UNION_ENTITIES,
-  UNION_ENTITIES_LIST,
-  UNION_UPDATE_DTO,
-} from './utils.model';
+import { USER_FIELDS } from '../users/entities/user.entity';
+import { ENTITY_NAME, UNION_ENTITIES, UNION_ENTITIES_LIST, UNION_UPDATE_DTO } from './utils.model';
 
 @Injectable()
 export class UtilsService {
-  private readonly db = db;
-
   validateId(id: string): void {
     const isValidId = validateUUID(id);
 
@@ -38,18 +30,19 @@ export class UtilsService {
     throw new UnprocessableEntityException(`${entityName} with id ${id} is not exist`);
   }
 
-  findElement(
-    entity: ENTITY,
+  async findAllElements(repository: Repository<UNION_ENTITIES>): Promise<UNION_ENTITIES_LIST> {
+    return await repository.find();
+  }
+
+  async findElement(
+    repository: Repository<UNION_ENTITIES>,
     id: string,
-    searchField: string,
     name: ENTITY_NAME,
     isFavs?: boolean,
-  ): UNION_ENTITIES {
+  ): Promise<UNION_ENTITIES> {
     this.validateId(id);
 
-    const element = (<UNION_ENTITIES_LIST>this.db[entity]).find(
-      (element) => element[searchField] === id,
-    );
+    const element = await repository.findOne({ where: { id } });
 
     if (!element) {
       isFavs
@@ -60,44 +53,33 @@ export class UtilsService {
     return element;
   }
 
-  findElementsByCriterium(
-    entity: ENTITY,
-    id: string,
-    searchField: string,
-    inFavs?: boolean,
-  ): UNION_ENTITIES_LIST {
-    this.validateId(id);
-
-    const element_DB: UNION_ENTITIES_LIST = inFavs ? this.db.favorites[entity] : this.db[entity];
-
-    return element_DB.filter((element) => element[searchField] === id);
+  async removeElement(
+    repository: Repository<UNION_ENTITIES>,
+    element: UNION_ENTITIES,
+  ): Promise<void> {
+    await repository.remove(element);
   }
 
-  removeElement(entity: ENTITY, element: UNION_ENTITIES, fromFavs?: boolean): void {
-    const element_DB: UNION_ENTITIES_LIST = fromFavs ? this.db.favorites[entity] : this.db[entity];
+  async createElement(
+    repository: Repository<UNION_ENTITIES>,
+    element: UNION_ENTITIES,
+  ): Promise<UNION_ENTITIES> {
+    const createdElement = repository.create(element);
 
-    const index = element_DB.indexOf(element);
-
-    element_DB.splice(index, 1);
+    return await repository.save(createdElement);
   }
 
-  createElement(entity: ENTITY, element: UNION_ENTITIES): UNION_ENTITIES {
-    (<UNION_ENTITIES_LIST>this.db[entity]).push(element);
-
-    return element;
-  }
-
-  updateElement(
-    entity: ENTITY,
+  async updateElement(
+    repository: Repository<UNION_ENTITIES>,
     id: string,
     name: ENTITY_NAME,
     updateDto: UNION_UPDATE_DTO,
-  ): UNION_ENTITIES {
-    const element = this.findElement(entity, id, 'id', name);
+  ): Promise<UNION_ENTITIES> {
+    const element = await this.findElement(repository, id, name);
 
     if (USER_FIELDS.PASSWORD in element) {
       if ((<UpdateUserDto>updateDto).oldPassword !== element.password) {
-        throw new ForbiddenException(`${element instanceof User}`);
+        throw new ForbiddenException('Old password is wrong');
       }
 
       element.password = (<UpdateUserDto>updateDto).newPassword;
@@ -109,6 +91,6 @@ export class UtilsService {
       keys.forEach((key) => (element[key] = updateDto[key]));
     }
 
-    return element;
+    return await repository.save(element);
   }
 }

@@ -14,18 +14,21 @@ export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> 
       map((data) => {
         if (Array.isArray(data)) {
           return data.map((el: User) => {
-            const copy = { ...el };
-            delete copy.password;
-
-            return copy;
+            return transformElement(el);
           });
         } else {
-          const copy = { ...data };
-          delete copy.password;
-
-          return copy;
+          return transformElement(data);
         }
       }),
     );
   }
+}
+
+function transformElement(element: User | any) {
+  const copy = { ...element };
+  delete copy.password;
+  copy.createdAt = +copy.createdAt;
+  copy.updatedAt = +copy.updatedAt;
+
+  return copy;
 }
