@@ -1,17 +1,17 @@
 import * as dotenv from 'dotenv';
-import * as path from 'path';
 import { DataSourceOptions } from 'typeorm';
+import { Album } from '../albums/entities/album.entity';
+import { Artist } from '../artists/entities/artist.entity';
+import { Favorite } from '../favorites/entities/favorite.entity';
+import { Track } from '../tracks/entities/track.entity';
+import { User } from '../users/entities/user.entity';
 
 dotenv.config();
 
 export const typeOrmConfig: DataSourceOptions = {
   type: 'postgres',
-  host: 'localhost',
-  port: +process.env.POSTGRES_PORT,
-  username: process.env.POSTGRES_USER,
-  password: process.env.POSTGRES_PASSWORD,
-  database: process.env.POSTGRES_DB,
-  entities: [path.join(__dirname, '**', 'entities', '*.entity.{ts,js}')],
-  //   migrationsRun: true,
+  url: process.env.DATABASE_URL,
+  entities: [User, Album, Artist, Track, Favorite],
+  migrationsRun: true,
   synchronize: false,
 };

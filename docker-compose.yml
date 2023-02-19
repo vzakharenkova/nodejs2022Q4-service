@@ -2,22 +2,28 @@ version: '3.4'
 
 services:
   homelibrary:
-    image: vika1999/homelibrary
+    image: homelibrary
+    build:
+      dockerfile: Dockerfile
+      context: .
     volumes:
-      - .:/usr/app/
-    networks:
-      - homelibrary-net
-    working_dir: /usr/app
+      - ./src:/usr/app/src
     environment:
       NODE_ENV: production
       PORT: ${PORT}
+      DATABASE_URL: ${DATABASE_URL}
+    networks:
+      - homelibrary-net
     depends_on:
       - postgres
     restart: always
     ports:
       - ${PORT}:${PORT}
   postgres:
-    image: vika1999/postgres
+    image: postgres
+    build:
+      context: .
+      dockerfile: ./src/database/Dockerfile
     volumes:
       - db-data:/var/lib/postgresql/data
     networks:

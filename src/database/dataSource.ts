@@ -1,8 +1,9 @@
-import * as path from 'path';
 import { DataSource } from 'typeorm';
+import { init1676814319755 } from '../migrations/1676814319755-init';
 import { typeOrmConfig } from './ormconfig';
 
 export default new DataSource({
   ...typeOrmConfig,
-  migrations: [path.join(__dirname, 'migrations', '*.{ts,js}')],
+  migrations: [init1676814319755],
+  migrationsTableName: 'migrations',
 });
