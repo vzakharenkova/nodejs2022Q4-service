@@ -5,11 +5,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
-// import { SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
-// import { readFile } from 'fs/promises';
-// import { join } from 'path';
-// import { parse } from 'yaml';
 
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './utils/http-exception.filter';
@@ -40,10 +36,6 @@ async function bootstrap() {
       },
     }),
   );
-
-  //   const swaggerDocs = await readFile(join(__dirname, '..', 'doc/api.yaml'), 'utf-8');
-
-  //   SwaggerModule.setup('doc', app, parse(swaggerDocs));
 
   await app.listen(process.env.PORT || 4000, async () =>
     console.log(`App is running on ${await app.getUrl()}`),
