@@ -15,7 +15,7 @@
     "start:prod": "node dist/main",
     "start:docker": "npm run build && npm run migration:run && npm run nodemon",
     "docker:build": "docker compose up --build",
-    "docker:scan": "docker scan vika1999/homelibrary && docker scan vika1999/postgres",
+    "docker:scan": "docker scan vika1999/homelibrary_1:latest_db && vika1999/homelibrary_1:latest",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "nodemon": "nodemon --legacy-watch -x ts-node src/main.ts",
     "test": "jest --config ./test/jest-e2e.json",
