@@ -8,16 +8,20 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import * as dotenv from 'dotenv';
 
 import { AppModule } from './app.module';
+import { CustomLoggerService } from './logger/custom-logger.service';
 import { HttpExceptionFilter } from './utils/http-exception.filter';
 
 dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const logger = new CustomLoggerService();
+
+  app.useLogger(logger);
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
-  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalFilters(new HttpExceptionFilter(logger));
 
   app.useGlobalPipes(
     new ValidationPipe({
