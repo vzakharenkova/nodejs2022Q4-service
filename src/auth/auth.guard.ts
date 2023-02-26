@@ -20,11 +20,10 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('authorization header does not match Bearer scheme');
     }
 
-    const verification = jwt.verify(parsedAuthHeader[1], process.env.JWT_SECRET_KEY);
-
-    if (verification) {
+    try {
+      jwt.verify(parsedAuthHeader[1], process.env.JWT_SECRET_KEY);
       return true;
-    } else {
+    } catch {
       throw new UnauthorizedException('access token has expired');
     }
   }
