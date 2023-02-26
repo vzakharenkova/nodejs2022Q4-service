@@ -8,6 +8,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import * as dotenv from 'dotenv';
 
 import { AppModule } from './app.module';
+import { AuthGuard } from './auth/auth.guard';
 import { CustomLoggerService } from './logger/custom-logger.service';
 import { HttpExceptionFilter } from './utils/http-exception.filter';
 
@@ -40,6 +41,8 @@ async function bootstrap() {
       },
     }),
   );
+
+  app.useGlobalGuards(new AuthGuard());
 
   process.on('uncaughtException', (err, origin) => {
     logger.customError(`Uncaught exception: ${err}. Origin: ${origin}.`);

@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './database/ormconfig';
 import { CustomLoggerMiddleware } from './logger/custom-logger.middleware';
 import { CustomLoggerModule } from './logger/custom-logger.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CustomLoggerModule } from './logger/custom-logger.module';
     AlbumsModule,
     FavoritesModule,
     CustomLoggerModule,
+    AuthModule,
   ],
 })
 export class AppModule {
