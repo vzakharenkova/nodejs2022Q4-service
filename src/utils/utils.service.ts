@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ForbiddenException,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
@@ -8,8 +7,6 @@ import {
 import { Repository } from 'typeorm';
 import { validate as validateUUID } from 'uuid';
 
-import { UpdateUserDto } from '../users/dto/update-user.dto';
-import { USER_FIELDS } from '../users/entities/user.entity';
 import { ENTITY_NAME, UNION_ENTITIES, UNION_ENTITIES_LIST, UNION_UPDATE_DTO } from './utils.model';
 
 @Injectable()
@@ -77,19 +74,9 @@ export class UtilsService {
   ): Promise<UNION_ENTITIES> {
     const element = await this.findElement(repository, id, name);
 
-    if (USER_FIELDS.PASSWORD in element) {
-      if ((<UpdateUserDto>updateDto).oldPassword !== element.password) {
-        throw new ForbiddenException('Old password is wrong');
-      }
+    const keys = Object.keys(updateDto);
 
-      element.password = (<UpdateUserDto>updateDto).newPassword;
-      element.updatedAt = new Date().getTime();
-      ++element.version;
-    } else {
-      const keys = Object.keys(updateDto);
-
-      keys.forEach((key) => (element[key] = updateDto[key]));
-    }
+    keys.forEach((key) => (element[key] = updateDto[key]));
 
     return await repository.save(element);
   }

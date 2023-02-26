@@ -46,7 +46,6 @@ export class CustomLoggerService extends ConsoleLogger {
   }
 
   private async writeLogs(type: 'access' | 'error', msg: string) {
-    console.log(process.env);
     const currFile = type === 'access' ? this.currentLogFile.name : this.currentErrorFile.name;
 
     stat(__dirname + currFile)
