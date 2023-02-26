@@ -41,6 +41,16 @@ async function bootstrap() {
     }),
   );
 
+  process.on('uncaughtException', (err, origin) => {
+    logger.customError(`Uncaught exception: ${err}. Origin: ${origin}.`);
+    process.exit(1);
+  });
+
+  process.on('unhandledRejection', (reason) => {
+    logger.customError(`Unhandled Rejection: ${reason}`);
+    process.exit(1);
+  });
+
   await app.listen(process.env.PORT || 4000, async () =>
     console.log(`App is running on ${await app.getUrl()}`),
   );
