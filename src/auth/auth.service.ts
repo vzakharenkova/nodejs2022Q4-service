@@ -33,6 +33,8 @@ export class AuthService {
       jwt.verify(createRefreshTokenDto.refreshToken, process.env.JWT_SECRET_REFRESH_KEY)
     );
 
+    if (!decodedUserData) throw new ForbiddenException('Refresh token is invalid or expired');
+
     const users = await this.usersService.findByCriterium('userId', decodedUserData.userId);
 
     if (!users || !users.length)
