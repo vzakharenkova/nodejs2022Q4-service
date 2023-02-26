@@ -35,7 +35,7 @@ export class AuthService {
 
     if (!decodedUserData) throw new ForbiddenException('Refresh token is invalid or expired');
 
-    const users = await this.usersService.findByCriterium('userId', decodedUserData.userId);
+    const users = await this.usersService.findByCriterium('id', decodedUserData.userId);
 
     if (!users || !users.length)
       throw new ForbiddenException('Refresh token is invalid or expired');
