@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import { Injectable, Scope, ConsoleLogger, LogLevel } from '@nestjs/common';
 
 import { createWriteStream } from 'fs';
-import { stat } from 'fs/promises';
+import { mkdir, access, stat } from 'fs/promises';
 
 dotenv.config();
 
@@ -42,11 +42,13 @@ export class CustomLoggerService extends ConsoleLogger {
   }
 
   private generateFileName(type: 'access' | 'error') {
-    return '/' + type + Date.now() + '.log';
+    return '/logs/' + type + Date.now() + '.log';
   }
 
   private async writeLogs(type: 'access' | 'error', msg: string) {
     const currFile = type === 'access' ? this.currentLogFile.name : this.currentErrorFile.name;
+
+    access(__dirname + '/logs').catch(() => mkdir(__dirname + '/logs'));
 
     stat(__dirname + currFile)
       .then((value) => {
