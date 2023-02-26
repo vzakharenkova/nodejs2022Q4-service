@@ -1,8 +1,7 @@
 import * as dotenv from 'dotenv';
 import { Injectable, Scope, ConsoleLogger, LogLevel } from '@nestjs/common';
 
-import { createWriteStream } from 'fs';
-import { mkdir, access, stat } from 'fs/promises';
+import { accessSync, createWriteStream, mkdirSync, statSync } from 'fs';
 
 dotenv.config();
 
@@ -42,27 +41,30 @@ export class CustomLoggerService extends ConsoleLogger {
   }
 
   private generateFileName(type: 'access' | 'error') {
-    return '/logs/' + type + Date.now() + '.log';
+    return '/app_logs/' + type + Date.now() + '.log';
   }
 
   private async writeLogs(type: 'access' | 'error', msg: string) {
     const currFile = type === 'access' ? this.currentLogFile.name : this.currentErrorFile.name;
 
-    access(__dirname + '/logs').catch(() => mkdir(__dirname + '/logs'));
+    try {
+      accessSync(__dirname + '/app_logs');
+    } catch {
+      mkdirSync(__dirname + '/app_logs');
+    }
 
-    stat(__dirname + currFile)
-      .then((value) => {
-        if (value.size / BIT_IN_KB >= Number(process.env.LOGGER_SIZE) || 10) {
-          type === 'access'
-            ? (this.currentLogFile.name = this.generateFileName('access'))
-            : (this.currentErrorFile.name = this.generateFileName('error'));
-        }
-      })
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      .catch(() => {})
-      .then(() => {
-        const stream = createWriteStream(__dirname + currFile, { flags: 'a' });
-        stream.write(msg + '\n');
-      });
+    try {
+      if (
+        statSync(__dirname + currFile).size / BIT_IN_KB >= Number(process.env.LOGGER_SIZE) ||
+        10
+      ) {
+        type === 'access'
+          ? (this.currentLogFile.name = this.generateFileName('access'))
+          : (this.currentErrorFile.name = this.generateFileName('error'));
+      }
+    } catch {}
+
+    const stream = createWriteStream(__dirname + currFile, { flags: 'a' });
+    stream.write(msg + '\n');
   }
 }
