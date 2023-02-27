@@ -8,16 +8,21 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import * as dotenv from 'dotenv';
 
 import { AppModule } from './app.module';
+import { AuthGuard } from './auth/auth.guard';
+import { CustomLoggerService } from './logger/custom-logger.service';
 import { HttpExceptionFilter } from './utils/http-exception.filter';
 
 dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const logger = new CustomLoggerService();
+
+  app.useLogger(logger);
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
-  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalFilters(new HttpExceptionFilter(logger));
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -36,6 +41,18 @@ async function bootstrap() {
       },
     }),
   );
+
+  app.useGlobalGuards(new AuthGuard());
+
+  process.on('uncaughtException', (err, origin) => {
+    logger.error(`Uncaught exception: ${err}. Origin: ${origin}.`);
+    process.exit(1);
+  });
+
+  process.on('unhandledRejection', (reason) => {
+    logger.error(`Unhandled Rejection: ${reason}`);
+    process.exit(1);
+  });
 
   await app.listen(process.env.PORT || 4000, async () =>
     console.log(`App is running on ${await app.getUrl()}`),

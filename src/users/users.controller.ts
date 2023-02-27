@@ -5,7 +5,6 @@ import {
   Body,
   Param,
   Delete,
-  UseFilters,
   Put,
   HttpCode,
   UseInterceptors,
@@ -14,12 +13,10 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { HttpExceptionFilter } from '../utils/http-exception.filter';
 import { User } from './entities/user.entity';
 import { TransformInterceptor } from '../utils/transform.interceptor';
 
 @Controller('user')
-@UseFilters(new HttpExceptionFilter())
 @UseInterceptors(TransformInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

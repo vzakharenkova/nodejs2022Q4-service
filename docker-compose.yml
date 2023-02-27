@@ -8,10 +8,12 @@ services:
       context: .
     volumes:
       - ./src:/usr/app/src
-    environment:
-      NODE_ENV: production
-      PORT: ${PORT}
-      DATABASE_URL: ${DATABASE_URL}
+    # environment:
+    #   NODE_ENV: production
+    #   PORT: ${PORT}
+    #   DATABASE_URL: ${DATABASE_URL}
+    env_file:
+      - .env
     networks:
       - homelibrary-net
     depends_on:
