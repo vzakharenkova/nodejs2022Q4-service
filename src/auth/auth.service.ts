@@ -29,18 +29,20 @@ export class AuthService {
   }
 
   async refresh(createRefreshTokenDto: CreateRefreshTokenDto) {
-    const decodedUserData = <DecodedUserPayload>(
-      jwt.verify(createRefreshTokenDto.refreshToken, process.env.JWT_SECRET_REFRESH_KEY)
-    );
+    try {
+      const decodedUserData = <DecodedUserPayload>(
+        jwt.verify(createRefreshTokenDto.refreshToken, process.env.JWT_SECRET_REFRESH_KEY)
+      );
 
-    if (!decodedUserData) throw new ForbiddenException('Refresh token is invalid or expired');
+      const users = await this.usersService.findByCriterium('id', decodedUserData.userId);
 
-    const users = await this.usersService.findByCriterium('id', decodedUserData.userId);
+      if (!users || !users.length)
+        throw new ForbiddenException('Refresh token is invalid or expired');
 
-    if (!users || !users.length)
+      return this.generateToken(users[0]);
+    } catch {
       throw new ForbiddenException('Refresh token is invalid or expired');
-
-    return this.generateToken(users[0]);
+    }
   }
 
   generateToken(user: User) {

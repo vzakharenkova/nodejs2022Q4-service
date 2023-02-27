@@ -21,6 +21,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     response.status(status).json(resp);
 
-    this.customLoggerService.customError(`${resp.timestamp} - ${resp.statusCode}: ${resp.message}`);
+    this.customLoggerService.error(`${resp.timestamp} - ${resp.statusCode}: ${resp.message}`);
   }
 }

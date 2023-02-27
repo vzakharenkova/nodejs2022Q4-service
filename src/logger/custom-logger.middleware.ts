@@ -12,7 +12,7 @@ export class CustomLoggerMiddleware implements NestMiddleware {
     response.on('finish', () => {
       const { statusCode } = response;
 
-      this.customLoggerService.customLog(
+      this.customLoggerService.log(
         `${new Date().toISOString()} - ${method} ${originalUrl} | STATUS: ${statusCode} | ${JSON.stringify(
           body,
         )} | ${JSON.stringify(params)}`,

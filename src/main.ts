@@ -45,12 +45,12 @@ async function bootstrap() {
   app.useGlobalGuards(new AuthGuard());
 
   process.on('uncaughtException', (err, origin) => {
-    logger.customError(`Uncaught exception: ${err}. Origin: ${origin}.`);
+    logger.error(`Uncaught exception: ${err}. Origin: ${origin}.`);
     process.exit(1);
   });
 
   process.on('unhandledRejection', (reason) => {
-    logger.customError(`Unhandled Rejection: ${reason}`);
+    logger.error(`Unhandled Rejection: ${reason}`);
     process.exit(1);
   });
 
